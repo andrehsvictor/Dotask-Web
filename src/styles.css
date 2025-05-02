@@ -2,25 +2,25 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap');
 
 @theme {
-    --color-primary: 83, 128, 131;
-    --color-primary-light: 106, 158, 161;
-    --color-primary-dark: 66, 102, 104;
+    --color-primary: #538083;
+    --color-primary-light: #6a9ea1;
+    --color-primary-dark: #426668;
 
-    --color-secondary: 42, 127, 98;
-    --color-secondary-light: 53, 160, 124;
-    --color-secondary-dark: 33, 100, 78;
+    --color-secondary: #2a7f62;
+    --color-secondary-light: #35a07c;
+    --color-secondary-dark: #21644e;
 
-    --color-background: 223, 217, 226;
-    --color-background-light: 245, 242, 247;
-    --color-background-dark: 200, 192, 206;
+    --color-background: #dfd9e2;
+    --color-background-light: #f5f2f7;
+    --color-background-dark: #c8c0ce;
 
-    --color-text: 137, 144, 159;
-    --color-text-light: 161, 167, 179;
-    --color-text-dark: 112, 121, 137;
+    --color-text: #89909f;
+    --color-text-light: #a1a7b3;
+    --color-text-dark: #707989;
 
-    --color-accent: 195, 172, 206;
-    --color-accent-light: 213, 196, 220;
-    --color-accent-dark: 172, 143, 186;
+    --color-accent: #c3acce;
+    --color-accent-light: #d5c4dc;
+    --color-accent-dark: #ac8fba;
 }
 
 * {
@@ -35,4 +35,9 @@ h5,
 h6 {
     font-family: 'Poppins', sans-serif;
     font-weight: 600;
+}
+
+button:hover,
+a:hover {
+    cursor: pointer;
 }
