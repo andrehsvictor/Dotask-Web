@@ -38,6 +38,11 @@ h6 {
 }
 
 button:hover,
+input[type="checkbox"]:hover,
 a:hover {
     cursor: pointer;
+}
+
+body {
+    background-color: var(--color-background);
 }
