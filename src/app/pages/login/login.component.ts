@@ -3,6 +3,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TaskIllustrationComponent } from '../../components/task-illustration/task-illustration.component';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,7 @@ import { TaskIllustrationComponent } from '../../components/task-illustration/ta
   imports: [
     CommonModule,
     FormsModule,
+    RouterLink,
     MatIconModule,
     TaskIllustrationComponent
   ]
