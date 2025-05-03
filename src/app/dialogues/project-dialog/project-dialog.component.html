@@ -1,0 +1,52 @@
+<div class="p-4 min-w-[350px]">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-text-dark">{{ title }}</h2>
+        <button mat-icon-button (click)="onCancel()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate" class="mb-4"></mat-progress-bar>
+
+    <form (ngSubmit)="onSubmit()" #projectForm="ngForm" class="space-y-4">
+        <!-- Name field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Project Name</mat-label>
+            <input matInput type="text" name="name" [(ngModel)]="project.name" required placeholder="Enter project name"
+                #nameInput="ngModel">
+            <mat-error *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+                Project name is required
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Description field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Description</mat-label>
+            <textarea matInput name="description" [(ngModel)]="project.description"
+                placeholder="Enter project description" rows="3"></textarea>
+        </mat-form-field>
+
+        <!-- Color selection -->
+        <div>
+            <p class="text-sm text-text mb-2">Select project color:</p>
+            <div class="flex space-x-3 mb-3">
+                <div *ngFor="let color of colorOptions"
+                    class="w-8 h-8 rounded-full cursor-pointer border-2 transition-all" [style.background-color]="color"
+                    [style.border-color]="project.color === color ? '#333' : 'transparent'"
+                    (click)="selectColor(color)">
+                </div>
+            </div>
+            <div class="flex items-center">
+                <div class="w-5 h-5 rounded-full mr-2" [style.background-color]="project.color"></div>
+                <span class="text-sm text-text">Selected color</span>
+            </div>
+        </div>
+
+        <div class="flex justify-end space-x-2 pt-2">
+            <button mat-button type="button" [disabled]="loading" (click)="onCancel()">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="projectForm.invalid || loading">
+                {{ isEditMode ? 'Save Changes' : 'Create Project' }}
+            </button>
+        </div>
+    </form>
+</div>
