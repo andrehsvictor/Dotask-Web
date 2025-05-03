@@ -1,0 +1,241 @@
+<div class="min-h-screen bg-background-light">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <div class="flex items-center">
+                    <h1 class="text-2xl font-bold text-primary">Dotask</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="p-2 rounded-full hover:bg-background-light" [matMenuTriggerFor]="userMenu">
+                        <div class="flex items-center">
+                            <span class="mr-2 text-text-dark">{{ user?.name || 'User' }}</span>
+                            <div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+                                {{ userInitials }}
+                            </div>
+                        </div>
+                    </button>
+                    <mat-menu #userMenu="matMenu">
+                        <button mat-menu-item routerLink="/profile">
+                            <mat-icon>account_circle</mat-icon>
+                            <span>Profile</span>
+                        </button>
+                        <button mat-menu-item (click)="logout()">
+                            <mat-icon>logout</mat-icon>
+                            <span>Logout</span>
+                        </button>
+                    </mat-menu>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <!-- Welcome section -->
+        <div class="mb-8">
+            <h2 class="text-3xl font-bold text-text-dark">Welcome, {{ user?.name || 'User' }}!</h2>
+            <p class="text-text mt-2">Here's an overview of your tasks and projects.</p>
+        </div>
+
+        <!-- Stats section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-background">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-primary-light/20 text-primary">
+                        <mat-icon>checklist</mat-icon>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-text-dark font-medium">Total Tasks</h3>
+                        <p class="text-3xl font-bold text-text-dark">{{ user?.taskCount || 0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-background">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-secondary-light/20 text-secondary">
+                        <mat-icon>folder</mat-icon>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-text-dark font-medium">Projects</h3>
+                        <p class="text-3xl font-bold text-text-dark">{{ user?.projectCount || 0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-background">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-accent-light/20 text-accent-dark">
+                        <mat-icon>pending_actions</mat-icon>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-text-dark font-medium">Pending Tasks</h3>
+                        <p class="text-3xl font-bold text-text-dark">{{ pendingTasksCount || 0 }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-lg shadow-sm border border-background">
+                <div class="flex items-center">
+                    <div class="p-3 rounded-full bg-primary-dark/20 text-primary-dark">
+                        <mat-icon>task_alt</mat-icon>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-text-dark font-medium">Completed</h3>
+                        <p class="text-3xl font-bold text-text-dark">{{ completedTasksCount || 0 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Tasks column -->
+            <div class="lg:col-span-2">
+                <div class="bg-white rounded-lg shadow-sm border border-background p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-text-dark">Recent Tasks</h2>
+                        <button class="text-primary hover:text-primary-dark flex items-center"
+                            (click)="openNewTaskDialog()">
+                            <mat-icon class="mr-1">add</mat-icon>
+                            <span>New Task</span>
+                        </button>
+                    </div>
+
+                    <div *ngIf="isLoadingTasks" class="flex justify-center p-8">
+                        <mat-spinner diameter="40"></mat-spinner>
+                    </div>
+
+                    <div *ngIf="!isLoadingTasks && tasks.length === 0" class="text-center py-8">
+                        <div class="text-text mb-4">
+                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;">task</mat-icon>
+                        </div>
+                        <h3 class="text-lg font-medium text-text-dark mb-2">No tasks yet</h3>
+                        <p class="text-text mb-4">Create your first task to start organizing your work</p>
+                        <button mat-raised-button color="primary" (click)="openNewTaskDialog()">
+                            <mat-icon class="mr-1">add</mat-icon>
+                            Add Task
+                        </button>
+                    </div>
+
+                    <div *ngIf="!isLoadingTasks && tasks.length > 0" class="space-y-3">
+                        <div *ngFor="let task of tasks"
+                            class="border border-background p-4 rounded-md hover:bg-background-light/30 transition-colors">
+                            <div class="flex items-center">
+                                <div [ngClass]="{
+                    'bg-background-dark': task.status === 'PENDING',
+                    'bg-primary': task.status === 'IN_PROGRESS',
+                    'bg-secondary': task.status === 'COMPLETED',
+                    'bg-text-light': task.status === 'CANCELLED'
+                  }" class="w-3 h-3 rounded-full mr-3"></div>
+                                <h4 class="text-text-dark font-medium flex-1">{{ task.title }}</h4>
+                                <div class="flex items-center">
+                                    <span [ngClass]="{
+                      'bg-background-light text-text': task.priority === 'LOW',
+                      'bg-primary-light/20 text-primary-dark': task.priority === 'MEDIUM',
+                      'bg-secondary-light/20 text-secondary-dark': task.priority === 'HIGH'
+                    }" class="text-xs px-2 py-1 rounded">
+                                        {{ task.priority }}
+                                    </span>
+                                </div>
+                            </div>
+                            <p *ngIf="task.description" class="text-text text-sm mt-2 ml-6">{{ task.description }}</p>
+                            <div class="flex justify-between items-center mt-3 ml-6">
+                                <div class="text-xs text-text">
+                                    <span *ngIf="task.dueDate">Due: {{ task.dueDate | date:'mediumDate' }}</span>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button mat-icon-button [matMenuTriggerFor]="taskMenu"
+                                        (click)="$event.stopPropagation()">
+                                        <mat-icon>more_vert</mat-icon>
+                                    </button>
+                                    <mat-menu #taskMenu="matMenu">
+                                        <button mat-menu-item (click)="openEditTaskDialog(task)">
+                                            <mat-icon>edit</mat-icon>
+                                            <span>Edit</span>
+                                        </button>
+                                        <button mat-menu-item (click)="updateTaskStatus(task.id, 'COMPLETED')"
+                                            *ngIf="task.status !== 'COMPLETED'">
+                                            <mat-icon>check_circle</mat-icon>
+                                            <span>Mark Complete</span>
+                                        </button>
+                                        <button mat-menu-item (click)="updateTaskStatus(task.id, 'IN_PROGRESS')"
+                                            *ngIf="task.status === 'PENDING'">
+                                            <mat-icon>pending</mat-icon>
+                                            <span>Start Progress</span>
+                                        </button>
+                                        <button mat-menu-item class="text-red-600" (click)="deleteTask(task.id)">
+                                            <mat-icon>delete</mat-icon>
+                                            <span>Delete</span>
+                                        </button>
+                                    </mat-menu>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!isLoadingTasks && tasks.length > 0" class="mt-6 text-center">
+                        <button mat-stroked-button color="primary" routerLink="/tasks">
+                            View All Tasks
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Projects column -->
+            <div class="lg:col-span-1">
+                <div class="bg-white rounded-lg shadow-sm border border-background p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-text-dark">My Projects</h2>
+                        <button class="text-primary hover:text-primary-dark flex items-center"
+                            (click)="openNewProjectDialog()">
+                            <mat-icon class="mr-1">add</mat-icon>
+                            <span>New Project</span>
+                        </button>
+                    </div>
+
+                    <div *ngIf="isLoadingProjects" class="flex justify-center p-8">
+                        <mat-spinner diameter="40"></mat-spinner>
+                    </div>
+
+                    <div *ngIf="!isLoadingProjects && projects.length === 0" class="text-center py-8">
+                        <div class="text-text mb-4">
+                            <mat-icon style="font-size: 48px; width: 48px; height: 48px;">folder</mat-icon>
+                        </div>
+                        <h3 class="text-lg font-medium text-text-dark mb-2">No projects yet</h3>
+                        <p class="text-text mb-4">Create your first project to organize related tasks</p>
+                        <button mat-raised-button color="primary" (click)="openNewProjectDialog()">
+                            <mat-icon class="mr-1">add</mat-icon>
+                            Add Project
+                        </button>
+                    </div>
+
+                    <div *ngIf="!isLoadingProjects && projects.length > 0" class="space-y-3">
+                        <div *ngFor="let project of projects"
+                            class="border border-background p-4 rounded-md hover:bg-background-light/30 transition-colors cursor-pointer"
+                            [routerLink]="['/projects', project.id]">
+                            <div class="flex items-center">
+                                <div class="w-3 h-3 rounded-full mr-3"
+                                    [style.background-color]="project.color || '#538083'"></div>
+                                <h4 class="text-text-dark font-medium">{{ project.name }}</h4>
+                            </div>
+                            <p *ngIf="project.description" class="text-text text-sm mt-2 ml-6">{{ project.description }}
+                            </p>
+                            <div class="ml-6 mt-2 flex items-center text-xs text-text">
+                                <mat-icon class="text-text mr-1"
+                                    style="font-size: 16px; width: 16px; height: 16px;">task</mat-icon>
+                                <span>{{ project.taskCount || 0 }} tasks</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div *ngIf="!isLoadingProjects && projects.length > 0" class="mt-6 text-center">
+                        <button mat-stroked-button color="primary" routerLink="/projects">
+                            View All Projects
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
