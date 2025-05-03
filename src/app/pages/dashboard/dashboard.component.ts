@@ -21,6 +21,8 @@ import { LoggerService } from '../../services/logger.service';
 import { GetUserDto } from '../../interfaces/user/get-user-dto';
 import { GetTaskDto } from '../../interfaces/task/get-task-dto';
 import { GetProjectDto } from '../../interfaces/project/get-project-dto';
+import { TaskDialogComponent } from '../../dialogues/task-dialog/task-dialog.component';
+import { ProjectDialogComponent } from '../../dialogues/project-dialog/project-dialog.component';
 
 @Component({
   selector: 'app-dashboard',
@@ -79,12 +81,6 @@ export class DashboardComponent implements OnInit {
       next: (userData) => {
         this.user = userData;
         this.logger.debug('User data loaded', { user: this.user });
-      },
-      error: (error) => {
-        this.logger.error('Failed to load user data', error);
-        if (error.status === 401) {
-          this.handleUnauthenticated();
-        }
       }
     });
   }
@@ -101,12 +97,6 @@ export class DashboardComponent implements OnInit {
 
           // Count tasks by status
           this.countTasksByStatus();
-        },
-        error: (error) => {
-          this.logger.error('Failed to load tasks', error);
-          if (error.status === 401) {
-            this.handleUnauthenticated();
-          }
         }
       });
   }
@@ -120,12 +110,6 @@ export class DashboardComponent implements OnInit {
         next: (response) => {
           this.projects = response.content;
           this.logger.debug('Projects loaded', { projects: this.projects });
-        },
-        error: (error) => {
-          this.logger.error('Failed to load projects', error);
-          if (error.status === 401) {
-            this.handleUnauthenticated();
-          }
         }
       });
   }
@@ -185,17 +169,118 @@ export class DashboardComponent implements OnInit {
   }
 
   openNewTaskDialog(): void {
-    // This would be implemented with a dialog component
-    // For now, navigate to task creation page
-    this.router.navigate(['/tasks/new']);
+    const dialogRef = this.dialog.open(TaskDialogComponent, {
+      width: '500px',
+      disableClose: true
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.task) {
+        this.createTask(result.task);
+      }
+    }
+    );
   }
 
   openEditTaskDialog(task: GetTaskDto): void {
-    this.logger.debug('Opening edit task dialog', { task });
+    const dialogRef = this.dialog.open(TaskDialogComponent, {
+      width: '500px',
+      maxHeight: '90vh',
+      data: { task },
+      disableClose: true
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.task) {
+        this.updateTask(task.id, result.task);
+      }
+    });
+  }
+
+  createTask(taskData: GetTaskDto): void {
+    this.taskService.create(taskData)
+      .subscribe({
+        next: (newTask) => {
+          // Add the new task to the beginning of the array
+          this.tasks = [newTask, ...this.tasks].slice(0, 5);
+          this.countTasksByStatus();
+
+          // Update user task count if available
+          if (this.user && this.user.taskCount !== undefined) {
+            this.user.taskCount += 1;
+          }
+
+          this.snackBar.open('Task created successfully', 'Close', {
+            duration: 3000
+          });
+        },
+        error: (error) => {
+          this.logger.error('Failed to create task', error);
+          this.snackBar.open('Failed to create task', 'Close', {
+            duration: 3000
+          });
+        }
+      });
+  }
+
+  updateTask(taskId: string, taskData: GetTaskDto): void {
+    this.taskService.update(taskId, taskData)
+      .subscribe({
+        next: (updatedTask) => {
+          // Update the task in the local array
+          const index = this.tasks.findIndex(t => t.id === taskId);
+          if (index !== -1) {
+            this.tasks[index] = updatedTask;
+            this.countTasksByStatus();
+          }
+
+          this.snackBar.open('Task updated successfully', 'Close', {
+            duration: 3000
+          });
+        },
+        error: (error) => {
+          this.logger.error('Failed to update task', error);
+          this.snackBar.open('Failed to update task', 'Close', {
+            duration: 3000
+          });
+        }
+      });
   }
 
   openNewProjectDialog(): void {
-    this.logger.debug('Opening new project dialog');
+    const dialogRef = this.dialog.open(ProjectDialogComponent, {
+      width: '500px',
+      disableClose: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result && result.project) {
+        this.createProject(result.project);
+      }
+    });
+  }
+
+  createProject(projectData: GetProjectDto): void {
+    this.projectService.create(projectData)
+      .subscribe({
+        next: (newProject) => {
+          // Add the new project to the beginning of the array
+          this.projects = [newProject, ...this.projects].slice(0, 3);
+
+          // Update user project count if available
+          if (this.user && this.user.projectCount !== undefined) {
+            this.user.projectCount += 1;
+          }
+
+          this.snackBar.open('Project created successfully', 'Close', {
+            duration: 3000
+          });
+        },
+        error: (error) => {
+          this.logger.error('Failed to create project', error);
+          this.snackBar.open('Failed to create project', 'Close', {
+            duration: 3000
+          });
+        }
+      });
   }
 
   logout(): void {
@@ -209,8 +294,51 @@ export class DashboardComponent implements OnInit {
       }
     });
   }
-
-  private handleUnauthenticated(): void {
-    
-  }
 }
+
+
+// // ...existing code...
+
+// import { ProjectDialogComponent } from '../../components/project-dialog/project-dialog.component';
+
+// // ...existing code...
+
+//   openNewProjectDialog(): void {
+//     const dialogRef = this.dialog.open(ProjectDialogComponent, {
+//       width: '500px',
+//       disableClose: true
+//     });
+
+//     dialogRef.afterClosed().subscribe(result => {
+//       if (result && result.project) {
+//         this.createProject(result.project);
+//       }
+//     });
+//   }
+
+//   createProject(projectData: any): void {
+//     this.projectService.create(projectData)
+//       .subscribe({
+//         next: (newProject) => {
+//           // Add the new project to the beginning of the array
+//           this.projects = [newProject, ...this.projects].slice(0, 3);
+          
+//           // Update user project count if available
+//           if (this.user && this.user.projectCount !== undefined) {
+//             this.user.projectCount += 1;
+//           }
+          
+//           this.snackBar.open('Project created successfully', 'Close', {
+//             duration: 3000
+//           });
+//         },
+//         error: (error) => {
+//           this.logger.error('Failed to create project', error);
+//           this.snackBar.open('Failed to create project', 'Close', {
+//             duration: 3000
+//           });
+//         }
+//       });
+//   }
+
+//   // ...existing code...
