@@ -4,7 +4,7 @@ import { LocalStorageService } from './local-storage.service';
 import { LoggerService } from './logger.service';
 import { CredentialsDto } from '../interfaces/auth/credentials-dto';
 import { Observable } from 'rxjs';
-import { environment } from '../../environments/environment.development';
+import { environment } from '../../environments/environment';
 import { GetTokenDto } from '../interfaces/auth/get-token-dto';
 import { TokenService } from './token.service';
 
