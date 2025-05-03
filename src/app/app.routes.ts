@@ -3,6 +3,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { SignupComponent } from './pages/signup/signup.component';
 import { VerifyEmailComponent } from './pages/verify-email/verify-email.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 export const routes: Routes = [
     {
@@ -21,4 +22,8 @@ export const routes: Routes = [
         path: 'reset-password',
         component: ResetPasswordComponent
     },
+    {
+        path: 'dashboard',
+        component: DashboardComponent,
+    }
 ];
