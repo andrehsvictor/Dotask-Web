@@ -4,6 +4,7 @@ import { LocalStorageService } from './local-storage.service';
 import { LoggerService } from './logger.service';
 import { GetTokenDto } from '../interfaces/auth/get-token-dto';
 import { HttpErrorResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -15,6 +16,7 @@ export class TokenService {
   constructor(
     private localStorageService: LocalStorageService,
     private logger: LoggerService,
+    private router: Router,
     private authService: AuthService,
   ) { }
 
@@ -28,6 +30,7 @@ export class TokenService {
       this.authService.refreshToken().subscribe({
         next: (response: GetTokenDto) => {
           this.accessToken = response.accessToken;
+          this.localStorageService.set('refreshToken', response.refreshToken);
           this.logger.debug('Access token refreshed:', response.accessToken);
         },
         error: (error: HttpErrorResponse) => {
@@ -36,6 +39,7 @@ export class TokenService {
           this.localStorageService.remove('refreshToken');
           this.logger.debug('Refresh token removed from local storage');
           this.logger.debug('User logged out due to token refresh failure');
+          this.router.navigate(['/login']);
         }
       });
     }
