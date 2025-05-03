@@ -7,6 +7,7 @@ import { PostUserDto } from '../interfaces/user/post-user-dto';
 import { SendActionEmailDto } from '../interfaces/user/send-action-email-dto';
 import { TokenService } from './token.service';
 import { PutUserDto } from '../interfaces/user/put-user-dto';
+import { ResetPasswordTokenDto } from '../interfaces/user/reset-password-token-dto';
 
 @Injectable({
   providedIn: 'root'
@@ -39,6 +40,10 @@ export class UserService {
         Authorization: `Bearer ${this.tokenService.getAccessToken()}`
       }
     });
+  }
+
+  resetPassword(resetPasswordTokenDto: ResetPasswordTokenDto): Observable<void> {
+    return this.http.post<void>(`${this.API_URL}/api/v1/users/password/reset`, resetPasswordTokenDto);
   }
 
 }
