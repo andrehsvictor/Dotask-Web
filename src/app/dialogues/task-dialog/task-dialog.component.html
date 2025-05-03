@@ -1,0 +1,66 @@
+<div class="p-4 min-w-[350px]">
+    <div class="flex justify-between items-center mb-4">
+        <h2 class="text-xl font-semibold text-text-dark">{{ title }}</h2>
+        <button mat-icon-button (click)="onCancel()">
+            <mat-icon>close</mat-icon>
+        </button>
+    </div>
+
+    <mat-progress-bar *ngIf="loading" mode="indeterminate" class="mb-4"></mat-progress-bar>
+
+    <form (ngSubmit)="onSubmit()" #taskForm="ngForm" class="space-y-4">
+        <!-- Title field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Task Title</mat-label>
+            <input matInput type="text" name="title" [(ngModel)]="task.title" required placeholder="Enter task title"
+                #titleInput="ngModel">
+            <mat-error *ngIf="titleInput.invalid && (titleInput.dirty || titleInput.touched)">
+                Title is required
+            </mat-error>
+        </mat-form-field>
+
+        <!-- Description field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Description</mat-label>
+            <textarea matInput name="description" [(ngModel)]="task.description" placeholder="Enter task description"
+                rows="3"></textarea>
+        </mat-form-field>
+
+        <!-- Priority field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Priority</mat-label>
+            <mat-select name="priority" [(ngModel)]="task.priority" required>
+                <mat-option value="LOW">Low</mat-option>
+                <mat-option value="MEDIUM">Medium</mat-option>
+                <mat-option value="HIGH">High</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- Status field (only for edit mode) -->
+        <mat-form-field *ngIf="isEditMode" appearance="fill" class="w-full">
+            <mat-label>Status</mat-label>
+            <mat-select name="status" [(ngModel)]="task.status" required>
+                <mat-option value="PENDING">Pending</mat-option>
+                <mat-option value="IN_PROGRESS">In Progress</mat-option>
+                <mat-option value="COMPLETED">Completed</mat-option>
+                <mat-option value="CANCELLED">Cancelled</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <!-- Due date field -->
+        <mat-form-field appearance="fill" class="w-full">
+            <mat-label>Due Date</mat-label>
+            <input matInput [matDatepicker]="picker" name="dueDate" [(ngModel)]="task.dueDate"
+                placeholder="Choose a date">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+
+        <div class="flex justify-end space-x-2 pt-2">
+            <button mat-button type="button" [disabled]="loading" (click)="onCancel()">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="taskForm.invalid || loading">
+                {{ isEditMode ? 'Save Changes' : 'Create Task' }}
+            </button>
+        </div>
+    </form>
+</div>
