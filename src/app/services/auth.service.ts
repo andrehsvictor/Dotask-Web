@@ -6,6 +6,7 @@ import { CredentialsDto } from '../interfaces/auth/credentials-dto';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment.development';
 import { GetTokenDto } from '../interfaces/auth/get-token-dto';
+import { TokenService } from './token.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,7 @@ export class AuthService {
   constructor(
     private http: HttpClient,
     private logger: LoggerService,
+    private tokenService: TokenService,
     private localStorageService: LocalStorageService,
   ) { }
 
@@ -24,12 +26,7 @@ export class AuthService {
     return this.http.post<GetTokenDto>(`${this.API_URL}/api/v1/token`, credentials);
   }
 
-  refreshToken(): Observable<GetTokenDto> {
-    const refreshToken = this.localStorageService.get<string>('refreshToken');
-    if (!refreshToken) {
-      this.logger.error('No refresh token found in local storage');
-      throw new Error('No refresh token found');
-    }
+  refreshToken(refreshToken: string): Observable<GetTokenDto> {
     return this.http.post<GetTokenDto>(`${this.API_URL}/api/v1/token/refresh`, { refreshToken });
   }
 
@@ -39,6 +36,7 @@ export class AuthService {
       this.logger.error('No refresh token found in local storage');
       throw new Error('No refresh token found');
     }
+    this.tokenService.clearTokens();
     return this.http.post<void>(`${this.API_URL}/api/v1/token/revoke`, { refreshToken });
   }
 
