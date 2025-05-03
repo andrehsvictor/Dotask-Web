@@ -26,23 +26,6 @@ export class TokenService {
   }
 
   getAccessToken(): string | null {
-    if (!this.accessToken) {
-      this.authService.refreshToken().subscribe({
-        next: (response: GetTokenDto) => {
-          this.accessToken = response.accessToken;
-          this.localStorageService.set('refreshToken', response.refreshToken);
-          this.logger.debug('Access token refreshed:', response.accessToken);
-        },
-        error: (error: HttpErrorResponse) => {
-          this.logger.error('Error refreshing access token:', error);
-          this.accessToken = null;
-          this.localStorageService.remove('refreshToken');
-          this.logger.debug('Refresh token removed from local storage');
-          this.logger.debug('User logged out due to token refresh failure');
-          this.router.navigate(['/login']);
-        }
-      });
-    }
     return this.accessToken;
   }
 

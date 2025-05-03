@@ -211,6 +211,6 @@ export class DashboardComponent implements OnInit {
   }
 
   private handleUnauthenticated(): void {
-    this.tokenService.getAccessToken();
+    
   }
 }
