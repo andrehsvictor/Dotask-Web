@@ -1,4 +1,4 @@
 export const environment = {
-    API_URL: 'https://dotask-aw0d.onrender.com',
+    API_URL: 'http://localhost:8080',
     production: false,
 };
