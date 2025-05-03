@@ -5,4 +5,6 @@ export interface GetUserDto {
     email: string;
     createdAt: Date;
     updatedAt: Date;
+    taskCount: number;
+    projectCount: number;
 }
