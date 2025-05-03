@@ -17,7 +17,7 @@
                 <p class="text-text mt-3">Sign up for your Dotask account</p>
             </div>
 
-            <form class="space-y-6">
+            <form #signupForm="ngForm" (ngSubmit)="onSubmit(signupForm)" class="space-y-6">
                 <!-- Name field -->
                 <div>
                     <label for="name" class="block text-sm font-medium text-text-dark mb-1">Full name</label>
@@ -25,9 +25,17 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <mat-icon class="h-5 w-5" [ngStyle]="{ color: 'var(--color-text)' }">person</mat-icon>
                         </div>
-                        <input type="text" id="name" name="name" required
+                        <input type="text" id="name" name="name" [(ngModel)]="user.name" #nameInput="ngModel" required
+                            minlength="2" maxlength="100"
                             class="bg-background/50 border border-background-dark focus:border-secondary focus:ring-2 focus:ring-secondary/20 block w-full pl-10 pr-3 py-3 rounded-lg text-text-dark placeholder:text-text/60 outline-none transition-all duration-200"
-                            placeholder="John Doe">
+                            placeholder="John Doe"
+                            [ngClass]="{'border-red-500': nameInput.invalid && (nameInput.dirty || nameInput.touched)}">
+                    </div>
+                    <div class="mt-1 text-sm text-red-500"
+                        *ngIf="nameInput.invalid && (nameInput.dirty || nameInput.touched)">
+                        <div *ngIf="nameInput.errors?.['required']">Name is required</div>
+                        <div *ngIf="nameInput.errors?.['minlength']">Name must be at least 2 characters</div>
+                        <div *ngIf="nameInput.errors?.['maxlength']">Name must be at most 100 characters</div>
                     </div>
                 </div>
 
@@ -38,9 +46,15 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <mat-icon class="h-5 w-5" [ngStyle]="{ color: 'var(--color-text)' }">email</mat-icon>
                         </div>
-                        <input type="email" id="email" name="email" required
+                        <input type="email" id="email" name="email" [(ngModel)]="user.email" #emailInput="ngModel"
+                            required pattern="{{emailPattern}}" email
                             class="bg-background/50 border border-background-dark focus:border-secondary focus:ring-2 focus:ring-secondary/20 block w-full pl-10 pr-3 py-3 rounded-lg text-text-dark placeholder:text-text/60 outline-none transition-all duration-200"
-                            placeholder="your.email@example.com">
+                            placeholder="your.email@example.com"
+                            [ngClass]="{'border-red-500': emailInput.invalid && (emailInput.dirty || emailInput.touched)}">
+                    </div>
+                    <div class="mt-1 text-sm text-red-500" *ngIf="emailInput.invalid && (emailInput.touched)">
+                        <div *ngIf="emailInput.errors?.['required']">Email is required</div>
+                        <div *ngIf="emailInput.errors?.['pattern']">Please enter a valid email address</div>
                     </div>
                 </div>
 
@@ -51,9 +65,24 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <mat-icon class="h-5 w-5" [ngStyle]="{ color: 'var(--color-text)' }">lock</mat-icon>
                         </div>
-                        <input type="password" id="password" name="password" required
-                            class="bg-background/50 border border-background-dark focus:border-secondary focus:ring-2 focus:ring-secondary/20 block w-full pl-10 pr-3 py-3 rounded-lg text-text-dark placeholder:text-text/60 outline-none transition-all duration-200"
-                            placeholder="••••••••">
+                        <input [type]="passwordVisible ? 'text' : 'password'" id="password" name="password"
+                            [(ngModel)]="user.password" #passwordInput="ngModel" required
+                            pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
+                            class="bg-background/50 border border-background-dark focus:border-secondary focus:ring-2 focus:ring-secondary/20 block w-full pl-10 pr-10 py-3 rounded-lg text-text-dark placeholder:text-text/60 outline-none transition-all duration-200"
+                            placeholder="••••••••"
+                            [ngClass]="{'border-red-500': passwordInput.invalid && (passwordInput.dirty || passwordInput.touched)}">
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            (click)="togglePasswordVisibility()">
+                            <mat-icon class="h-5 w-5" [ngStyle]="{ color: 'var(--color-text)' }">{{ passwordVisible ?
+                                'visibility_off' : 'visibility'
+                                }}</mat-icon>
+                        </button>
+                    </div>
+                    <div class="mt-1 text-sm text-red-500"
+                        *ngIf="passwordInput.invalid && ( passwordInput.touched)">
+                        <div *ngIf="passwordInput.errors?.['required']">Password is required</div>
+                        <div *ngIf="passwordInput.errors?.['pattern']">Password must be at least 8 characters with at
+                            least one uppercase, lowercase, digit and special character</div>
                     </div>
                 </div>
 
@@ -65,17 +94,34 @@
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                             <mat-icon class="h-5 w-5" [ngStyle]="{ color: 'var(--color-text)' }">lock_outline</mat-icon>
                         </div>
-                        <input type="password" id="confirmPassword" name="confirmPassword" required
-                            class="bg-background/50 border border-background-dark focus:border-secondary focus:ring-2 focus:ring-secondary/20 block w-full pl-10 pr-3 py-3 rounded-lg text-text-dark placeholder:text-text/60 outline-none transition-all duration-200"
-                            placeholder="••••••••">
+                        <input [type]="confirmPasswordVisible ? 'text' : 'password'" id="confirmPassword"
+                            name="confirmPassword" [(ngModel)]="user.confirmPassword" #confirmPasswordInput="ngModel"
+                            required
+                            class="bg-background/50 border border-background-dark focus:border-secondary focus:ring-2 focus:ring-secondary/20 block w-full pl-10 pr-10 py-3 rounded-lg text-text-dark placeholder:text-text/60 outline-none transition-all duration-200"
+                            placeholder="••••••••"
+                            [ngClass]="{'border-red-500': confirmPasswordInput.invalid && (confirmPasswordInput.dirty || confirmPasswordInput.touched)}">
+                        <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center"
+                            (click)="toggleConfirmPasswordVisibility()">
+                            <mat-icon class="h-5 w-5 text-text">{{ confirmPasswordVisible ? 'visibility_off' :
+                                'visibility' }}</mat-icon>
+                        </button>
+                    </div>
+                    <div class="mt-1 text-sm text-red-500"
+                        *ngIf="confirmPasswordInput.invalid && (confirmPasswordInput.dirty || confirmPasswordInput.touched)">
+                        <div *ngIf="confirmPasswordInput.errors?.['required']">Please confirm your password</div>
+                    </div>
+                    <div class="mt-1 text-sm text-red-500"
+                        *ngIf="user.password !== user.confirmPassword && confirmPasswordInput.dirty">
+                        Passwords do not match
                     </div>
                 </div>
 
                 <!-- Sign up button -->
-                <button type="submit"
-                    class="w-full flex justify-center py-3 px-4 rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all duration-200 font-medium">
-                    <mat-icon class="mr-2">person_add</mat-icon>
-                    Create account
+                <button type="submit" [disabled]="signupForm.invalid || isSubmitting"
+                    class="w-full flex justify-center py-3 px-4 rounded-lg text-white bg-secondary hover:bg-secondary-dark focus:outline-none focus:ring-2 focus:ring-secondary/50 transition-all duration-200 font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+                    <mat-icon class="mr-2" *ngIf="!isSubmitting">person_add</mat-icon>
+                    <mat-icon class="mr-2 animate-spin" *ngIf="isSubmitting">refresh</mat-icon>
+                    {{ isSubmitting ? 'Creating account...' : 'Create account' }}
                 </button>
 
                 <div class="text-center text-sm text-text mt-4">
