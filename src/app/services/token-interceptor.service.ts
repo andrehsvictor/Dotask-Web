@@ -23,12 +23,12 @@ export class TokenInterceptorService implements HttpInterceptor {
   ) { }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    // Não adiciona tokens em chamadas de autenticação
+    console.log('Interceptando requisição:', req);
+
     if (this.shouldSkipTokenInterceptor(req.url)) {
       return next.handle(req);
     }
 
-    // Adiciona token se disponível
     const accessToken = this.tokenService.getAccessToken();
     if (accessToken) {
       req = this.addTokenHeader(req, accessToken);
@@ -36,7 +36,7 @@ export class TokenInterceptorService implements HttpInterceptor {
 
     return next.handle(req).pipe(
       catchError(error => {
-        if (error instanceof HttpErrorResponse && error.status === 401) {
+        if (error instanceof HttpErrorResponse && error.status === 401 && error.error === null) {
           return this.handle401Error(req, next);
         }
 
@@ -71,7 +71,7 @@ export class TokenInterceptorService implements HttpInterceptor {
       const refreshToken = this.tokenService.getRefreshToken();
 
       if (refreshToken) {
-        return this.authService.refreshToken().pipe(
+        return this.authService.refreshToken(refreshToken).pipe(
           switchMap((tokens) => {
             this.isRefreshing = false;
 
@@ -102,7 +102,6 @@ export class TokenInterceptorService implements HttpInterceptor {
         return throwError(() => new Error('No refresh token available'));
       }
     } else {
-      // Aguarda até que o token seja atualizado
       return this.refreshTokenSubject.pipe(
         filter(token => token !== null),
         take(1),

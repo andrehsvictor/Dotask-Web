@@ -17,7 +17,6 @@ export class TokenService {
     private localStorageService: LocalStorageService,
     private logger: LoggerService,
     private router: Router,
-    private authService: AuthService,
   ) { }
 
   setAccessToken(token: string): void {
@@ -42,5 +41,11 @@ export class TokenService {
       return null;
     }
     return refreshToken;
+  }
+
+  clearTokens(): void {
+    this.accessToken = null;
+    this.localStorageService.remove('refreshToken');
+    this.logger.debug('Tokens cleared');
   }
 }
