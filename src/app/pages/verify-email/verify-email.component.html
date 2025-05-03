@@ -1,0 +1,107 @@
+<div class="min-h-screen flex items-center justify-center bg-background-light p-4">
+    <div class="bg-white rounded-lg shadow-lg max-w-md w-full p-8 text-center">
+        <!-- Logo ou ícone do app -->
+        <div class="flex justify-center mb-6">
+            <!-- SVG Illustration -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="180" height="160" viewBox="0 0 300 250" fill="none"
+                class="mb-4">
+                <!-- Background envelope shape -->
+                <rect x="40" y="60" width="220" height="150" rx="8" fill="#EAEEFF" />
+
+                <!-- Envelope flap open -->
+                <path d="M40 68C40 63.5817 43.5817 60 48 60H252C256.418 60 260 63.5817 260 68V70L150 140L40 70V68Z"
+                    fill="#D4DCFF" />
+
+                <!-- Mail icon inside -->
+                <rect x="100" y="95" width="100" height="80" rx="4" fill="white" stroke="#6B7CFF" stroke-width="2" />
+                <line x1="110" y1="115" x2="190" y2="115" stroke="#6B7CFF" stroke-width="2" />
+                <line x1="110" y1="135" x2="190" y2="135" stroke="#6B7CFF" stroke-width="2" />
+                <line x1="110" y1="155" x2="150" y2="155" stroke="#6B7CFF" stroke-width="2" />
+
+                <!-- Checkmark circle -->
+                <circle cx="220" cy="75" r="25" fill="#4CAF50" />
+                <path d="M210 75L217 82L230 69" stroke="white" stroke-width="4" stroke-linecap="round"
+                    stroke-linejoin="round" />
+
+                <!-- Decorative dots -->
+                <circle cx="70" cy="180" r="5" fill="#6B7CFF" />
+                <circle cx="90" cy="180" r="3" fill="#6B7CFF" opacity="0.7" />
+                <circle cx="105" cy="180" r="2" fill="#6B7CFF" opacity="0.4" />
+
+                <!-- Animated envelope edge (appears only on loading state) -->
+                <g *ngIf="isLoading" class="animate-pulse">
+                    <path
+                        d="M40 70L150 140L260 70V202C260 206.418 256.418 210 252 210H48C43.5817 210 40 206.418 40 202V70Z"
+                        stroke="#6B7CFF" stroke-width="2" fill="none" />
+                </g>
+
+                <!-- Success state envelope (appears only when verified) -->
+                <g *ngIf="!isLoading && isVerified">
+                    <path
+                        d="M40 70L150 140L260 70V202C260 206.418 256.418 210 252 210H48C43.5817 210 40 206.418 40 202V70Z"
+                        fill="#E1F5FE" stroke="#6B7CFF" stroke-width="2" />
+                </g>
+
+                <!-- Error state envelope (appears only on error) -->
+                <g *ngIf="!isLoading && isError">
+                    <path
+                        d="M40 70L150 140L260 70V202C260 206.418 256.418 210 252 210H48C43.5817 210 40 206.418 40 202V70Z"
+                        fill="#FFEBEE" stroke="#F44336" stroke-width="2" />
+                    <circle cx="220" cy="75" r="25" fill="#F44336" />
+                    <line x1="212" y1="67" x2="228" y2="83" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <line x1="228" y1="67" x2="212" y2="83" stroke="white" stroke-width="4" stroke-linecap="round" />
+                </g>
+            </svg>
+        </div>
+
+        <!-- Estado de carregamento -->
+        <div *ngIf="isLoading" class="space-y-4">
+            <h1 class="text-xl font-bold text-text-dark">Verifying your email</h1>
+            <p class="text-text">Please wait while we verify your email address...</p>
+            <div class="flex justify-center my-6">
+                <div class="animate-spin rounded-full h-10 w-10 border-b-2 border-primary"></div>
+            </div>
+        </div>
+
+        <!-- Estado de verificação bem-sucedida -->
+        <div *ngIf="!isLoading && isVerified" class="space-y-4">
+            <h1 class="text-xl font-bold text-text-dark">Email Verified!</h1>
+            <p class="text-text">Your email address has been successfully verified. You can now log in to your account.
+            </p>
+
+            <div class="mt-8">
+                <button routerLink="/"
+                    class="w-full py-2 px-4 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/50">
+                    <span class="flex items-center justify-center">
+                        <mat-icon class="mr-2">login</mat-icon>
+                        Go to Login
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Estado de erro -->
+        <div *ngIf="!isLoading && isError" class="space-y-4">
+            <h1 class="text-xl font-bold text-text-dark">Verification Failed</h1>
+            <p class="text-text">{{ errorMessage }}</p>
+
+            <div class="mt-8 space-y-4">
+                <button (click)="requestNewVerification()"
+                    class="w-full py-2 px-4 bg-secondary text-white rounded-lg hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-secondary/50">
+                    <span class="flex items-center justify-center">
+                        <mat-icon class="mr-2">refresh</mat-icon>
+                        Request New Verification
+                    </span>
+                </button>
+
+                <button routerLink="/"
+                    class="w-full py-2 px-4 bg-background-dark text-text rounded-lg hover:bg-background-dark/80 transition-colors duration-200 focus:outline-none">
+                    <span class="flex items-center justify-center">
+                        <mat-icon class="mr-2">arrow_back</mat-icon>
+                        Back to Login
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
